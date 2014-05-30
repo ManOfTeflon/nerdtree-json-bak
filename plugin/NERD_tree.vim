@@ -168,6 +168,10 @@ endif
 
 " SECTION: Public API {{{1
 "============================================================
+function! NERDTreeFromJSON(name, json)
+    call g:NERDTreeCreator.CreatePrimaryJSON(g:NERDTreePath.FromJSON([ a:name ], a:json))
+endfunction
+
 function! NERDTreeAddMenuItem(options)
     call g:NERDTreeMenuItem.Create(a:options)
 endfunction
@@ -201,6 +205,7 @@ function! NERDTreeCWD()
     call NERDTreeFocus()
     call nerdtree#chRootCwd()
 endfunction
+
 " SECTION: Post Source Actions {{{1
 call nerdtree#postSourceActions()
 

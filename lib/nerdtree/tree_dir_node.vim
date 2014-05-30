@@ -224,48 +224,69 @@ function! s:TreeDirNode._initChildren(silent)
     "remove all the current child nodes
     let self.children = []
 
-    "get an array of all the files in the nodes dir
-    let dir = self.path
-    let globDir = dir.str({'format': 'Glob'})
-
-    if version >= 703
-        let filesStr = globpath(globDir, '*', 1) . "\n" . globpath(globDir, '.*', 1)
-    else
-        let filesStr = globpath(globDir, '*') . "\n" . globpath(globDir, '.*')
-    endif
-
-    let files = split(filesStr, "\n")
-
-    if !a:silent && len(files) > g:NERDTreeNotificationThreshold
-        call nerdtree#echo("Please wait, caching a large dir ...")
-    endif
-
-    let invalidFilesFound = 0
-    for i in files
-
-        "filter out the .. and . directories
-        "Note: we must match .. AND ../ cos sometimes the globpath returns
-        "../ for path with strange chars (eg $)
-        if i !~# '\/\.\.\/\?$' && i !~# '\/\.\/\?$'
-
-            "put the next file in a new node and attach it
-            try
-                let path = g:NERDTreePath.New(i)
-                call self.createChild(path, 0)
-            catch /^NERDTree.\(InvalidArguments\|InvalidFiletype\)Error/
-                let invalidFilesFound += 1
-            endtry
+    if self.path.isJSON == 1
+        if version < 704
+            call nerdtree#echoWarning("Exterminator requires VIM 7.4 or higher to display gdb variables in tree view")
+            return 0
         endif
-    endfor
 
-    call self.sortChildren()
+        let lines = pyeval("json.loads(vim.eval('self.path.json'))")
 
-    if !a:silent && len(files) > g:NERDTreeNotificationThreshold
-        call nerdtree#echo("Please wait, caching a large dir ... DONE (". self.getChildCount() ." nodes cached).")
-    endif
+        for [ name, json ] in items(lines)
+            if type(json) == type("")
+                let path = g:NERDTreePath.FromJSON(self.path.pathSegments + [ name ], '')
+            else
+                let serial = pyeval("json.dumps(vim.eval('json'))")
+                let path = g:NERDTreePath.FromJSON(self.path.pathSegments + [ name ], serial)
+            endif
+            call self.createChild(path, 0)
+        endfor
 
-    if invalidFilesFound
-        call nerdtree#echoWarning(invalidFilesFound . " file(s) could not be loaded into the NERD tree")
+        call self.sortChildren()
+    else
+        "get an array of all the files in the nodes dir
+        let dir = self.path
+        let globDir = dir.str({'format': 'Glob'})
+
+        if version >= 703
+            let filesStr = globpath(globDir, '*', 1) . "\n" . globpath(globDir, '.*', 1)
+        else
+            let filesStr = globpath(globDir, '*') . "\n" . globpath(globDir, '.*')
+        endif
+
+        let files = split(filesStr, "\n")
+
+        if !a:silent && len(files) > g:NERDTreeNotificationThreshold
+            call nerdtree#echo("Please wait, caching a large dir ...")
+        endif
+
+        let invalidFilesFound = 0
+        for i in files
+
+            "filter out the .. and . directories
+            "Note: we must match .. AND ../ cos sometimes the globpath returns
+            "../ for path with strange chars (eg $)
+            if i !~# '\/\.\.\/\?$' && i !~# '\/\.\/\?$'
+
+                "put the next file in a new node and attach it
+                try
+                    let path = g:NERDTreePath.New(i)
+                    call self.createChild(path, 0)
+                catch /^NERDTree.\(InvalidArguments\|InvalidFiletype\)Error/
+                    let invalidFilesFound += 1
+                endtry
+            endif
+        endfor
+
+        call self.sortChildren()
+
+        if !a:silent && len(files) > g:NERDTreeNotificationThreshold
+            call nerdtree#echo("Please wait, caching a large dir ... DONE (". self.getChildCount() ." nodes cached).")
+        endif
+
+        if invalidFilesFound
+            call nerdtree#echoWarning(invalidFilesFound . " file(s) could not be loaded into the NERD tree")
+        endif
     endif
     return self.getChildCount()
 endfunction
@@ -277,7 +298,7 @@ endfunction
 "path: a path object representing the full filesystem path to the file/dir that the node represents
 unlet s:TreeDirNode.New
 function! s:TreeDirNode.New(path)
-    if a:path.isDirectory != 1
+    if a:path.isDirectory != 1 && a:path.isJSON != 1
         throw "NERDTree.InvalidArgumentsError: A TreeDirNode object must be instantiated with a directory Path object."
     endif
 

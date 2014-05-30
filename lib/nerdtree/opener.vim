@@ -155,9 +155,15 @@ endfunction
 "FUNCTION: Opener.open(target) {{{1
 function! s:Opener.open(target)
     if self._path.isDirectory
-        call self._openDirectory(a:target)
+        if self._path.isJSON
+            call self._openJSON(a:target)
+        else
+            call self._openDirectory(a:target)
+        endif
     else
-        call self._openFile()
+        if self._path.isJSON == 0
+            call self._openFile()
+        endif
     endif
 endfunction
 
@@ -196,6 +202,29 @@ function! s:Opener._openDirectory(node)
             call g:NERDTreeCreator.CreatePrimary(a:node.path.str())
         else
             call g:NERDTreeCreator.CreateSecondary(a:node.path.str())
+        endif
+    endif
+
+    if self._stay
+        call self._restoreCursorPos()
+    endif
+endfunction
+
+"FUNCTION: Opener._openDirectory(node) {{{1
+function! s:Opener._openJSON(node)
+    if self._treetype ==# "secondary"
+        call self._gotoTargetWin()
+        call g:NERDTreeCreator.CreateSecondaryJSON(a:node.path)
+    else
+        call self._gotoTargetWin()
+        if empty(self._where)
+            call a:node.makeRoot()
+            call nerdtree#renderView()
+            call a:node.putCursorHere(0, 0)
+        elseif self._where == 't'
+            call g:NERDTreeCreator.CreatePrimaryJSON(a:node.path)
+        else
+            call g:NERDTreeCreator.CreateSecondaryJSON(a:node.path)
         endif
     endif
 

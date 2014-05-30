@@ -35,13 +35,23 @@ endfunction
 "FUNCTION: s:Creator.CreatePrimary(a:name) {{{1
 function! s:Creator.CreatePrimary(name)
     let creator = s:Creator.New()
-    call creator.createPrimary(a:name)
+    call creator.createPrimary(a:name, 0)
+endfunction
+
+"FUNCTION: s:Creator.CreatePrimary(a:name) {{{1
+function! s:Creator.CreatePrimaryJSON(path)
+    let creator = s:Creator.New()
+    call creator.createPrimary(a:path, 1)
 endfunction
 
 "FUNCTION: s:Creator.createPrimary(a:name) {{{1
 "name: the name of a bookmark or a directory
-function! s:Creator.createPrimary(name)
-    let path = self._pathForString(a:name)
+function! s:Creator.createPrimary(name, json)
+    if a:json == 0
+        let path = self._pathForString(a:name)
+    else
+        let path = copy(a:name)
+    endif
 
     "if instructed to, then change the vim CWD to the dir the NERDTree is
     "inited in
@@ -77,17 +87,27 @@ endfunction
 "FUNCTION: s:Creator.CreateSecondary(dir) {{{1
 function! s:Creator.CreateSecondary(dir)
     let creator = s:Creator.New()
-    call creator.createSecondary(a:dir)
+    call creator.createSecondary(a:dir, 0)
+endfunction
+
+"FUNCTION: s:Creator.CreateSecondary(dir) {{{1
+function! s:Creator.CreateSecondaryJSON(path)
+    let creator = s:Creator.New()
+    call creator.createSecondary(a:path, 1)
 endfunction
 
 "FUNCTION: s:Creator.createSecondary(dir) {{{1
-function! s:Creator.createSecondary(dir)
-    try
-        let path = g:NERDTreePath.New(a:dir)
-    catch /^NERDTree.InvalidArgumentsError/
-        call nerdtree#echo("Invalid directory name:" . a:name)
-        return
-    endtry
+function! s:Creator.createSecondary(dir, json)
+    if a:json == 0
+        try
+            let path = g:NERDTreePath.New(a:dir)
+        catch /^NERDTree.InvalidArgumentsError/
+            call nerdtree#echo("Invalid directory name:" . a:name)
+            return
+        endtry
+    else
+        let path = copy(a:dir)
+    endif
 
     "we want the directory buffer to disappear when we do the :edit below
     setlocal bufhidden=wipe
@@ -315,7 +335,7 @@ function! s:Creator.togglePrimary(dir)
             call nerdtree#closeTree()
         endif
     else
-        call self.createPrimary(a:dir)
+        call self.createPrimary(a:dir, 0)
     endif
 endfunction
 

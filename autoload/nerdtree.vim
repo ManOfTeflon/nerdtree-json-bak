@@ -612,35 +612,44 @@ function! nerdtree#getPath(ln)
     let curFile = nerdtree#stripMarkupFromLine(line, 0)
 
     let wasdir = 0
-    if curFile =~# '/$'
-        let wasdir = 1
-        let curFile = substitute(curFile, '/\?$', '/', "")
-    endif
 
     let dir = ""
+    let dirs = []
     let lnum = a:ln
     while lnum > 0
         let lnum = lnum - 1
         let curLine = getline(lnum)
         let curLineStripped = nerdtree#stripMarkupFromLine(curLine, 1)
+        let isDir = curLine =~# nerdtree#treeMarkupReg()
 
         "have we reached the top of the tree?
         if lnum == rootLine
             let dir = b:NERDTreeRoot.path.str({'format': 'UI'}) . dir
+            let dirs = b:NERDTreeRoot.path.pathSegments + dirs
             break
         endif
-        if curLineStripped =~# '/$'
+        if isDir
             let lpindent = nerdtree#indentLevelFor(curLine)
             if lpindent < indent
                 let indent = indent - 1
 
                 let dir = substitute (curLineStripped,'^\\', "", "") . dir
+                let dirs = [ substitute (curLineStripped,'^\\', "", "") ] + dirs
                 continue
             endif
         endif
     endwhile
-    let curFile = b:NERDTreeRoot.path.drive . dir . curFile
-    let toReturn = g:NERDTreePath.New(curFile)
+    if b:NERDTreeRoot.path.isJSON == 0
+        if curFile =~# '/$'
+            let wasdir = 1
+            let curFile = substitute(curFile, '/\?$', '/', "")
+        endif
+        let curFile = b:NERDTreeRoot.path.drive . dir . curFile
+        let toReturn = g:NERDTreePath.New(curFile)
+    else
+        let dirs = dirs + [ curFile ]
+        let toReturn = g:NERDTreePath.FromJSON(dirs, "")
+    endif
     return toReturn
 endfunction
 
@@ -851,6 +860,10 @@ function! nerdtree#renderView()
     let @o = b:NERDTreeRoot.renderToString()
     silent put o
     let @o = old_o
+
+    if b:NERDTreeRoot.path.isJSON
+        silent set ft=cpp
+    endif
 
     "delete the blank line at the top of the buffer
     silent 1,1delete _
