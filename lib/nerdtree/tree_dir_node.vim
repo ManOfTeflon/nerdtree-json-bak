@@ -240,6 +240,7 @@ function! s:TreeDirNode._initChildren(silent)
                 let path = g:NERDTreePath.FromJSON(self.path.pathSegments + [ name ], serial)
             endif
             call self.createChild(path, 0)
+            unlet json
         endfor
 
         call self.sortChildren()
