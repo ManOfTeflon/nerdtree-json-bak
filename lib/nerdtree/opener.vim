@@ -163,6 +163,14 @@ function! s:Opener.open(target)
     else
         if self._path.isJSON == 0
             call self._openFile()
+        else
+            if has_key(g:NERDTreePlugin, 'ActivateJSON')
+                try
+                    call g:NERDTreePlugin.ActivateJSON(a:target.path.json)
+                catch
+                    echoe "Error running plugin!"
+                endtry
+            endif
         endif
     endif
 endfunction

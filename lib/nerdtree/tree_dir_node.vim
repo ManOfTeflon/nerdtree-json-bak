@@ -230,15 +230,22 @@ function! s:TreeDirNode._initChildren(silent)
             return 0
         endif
 
-        let lines = pyeval("json.loads(vim.eval('self.path.json'))")
+        if type(self.path.json) == type("")
+            if has_key(g:NERDTreePlugin, "FetchChildren")
+                try
+                    let lines = g:NERDTreePlugin.FetchChildren(self.path.json)
+                catch
+                    let lines = { "Error running plugin": {} }
+                endtry
+            else
+                let lines = pyeval("json.loads(vim.eval('self.path.json'))")
+            endif
+        else
+            let lines = self.path.json
+        endif
 
         for [ name, json ] in items(lines)
-            if type(json) == type("")
-                let path = g:NERDTreePath.FromJSON(self.path.pathSegments + [ name ], '')
-            else
-                let serial = pyeval("json.dumps(vim.eval('json'))")
-                let path = g:NERDTreePath.FromJSON(self.path.pathSegments + [ name ], serial)
-            endif
+            let path = g:NERDTreePath.FromJSON(self.path.pathSegments + [ name ], json)
             call self.createChild(path, 0)
             unlet json
         endfor

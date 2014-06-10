@@ -209,6 +209,10 @@ endfunction
 " SECTION: Post Source Actions {{{1
 call nerdtree#postSourceActions()
 
+if ! exists("g:NERDTreePlugin")
+    let g:NERDTreePlugin = { }
+endif
+
 "reset &cpo back to users setting
 let &cpo = s:old_cpo
 

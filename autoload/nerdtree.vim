@@ -945,6 +945,10 @@ function! nerdtree#stripMarkupFromLine(line, removeLeadingSpaces)
     "remove the tree parts and the leading space
     let line = substitute (line, nerdtree#treeMarkupReg(),"","")
 
+    if b:NERDTreeRoot.path.isJSON
+        return line
+    endif
+
     "strip off any read only flag
     let line = substitute (line, ' \[RO\]', "","")
 
