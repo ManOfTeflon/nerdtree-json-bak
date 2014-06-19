@@ -457,7 +457,7 @@ function! s:Path.FromJSON(names, json)
     let newPath.isExecutable = 0
     let newPath.pathSegments = a:names
     let newPath.isSymLink = 0
-    if type(a:json) == type({}) && a:json == {}
+    if type(a:json) == type(0)
         let newPath.isDirectory = 0
     else
         let newPath.isDirectory = 1

@@ -168,8 +168,8 @@ endif
 
 " SECTION: Public API {{{1
 "============================================================
-function! NERDTreeFromJSON(name, json)
-    call g:NERDTreeCreator.CreatePrimaryJSON(g:NERDTreePath.FromJSON([ a:name ], a:json))
+function! NERDTreeFromJSON(json)
+    call g:NERDTreeCreator.CreatePrimaryJSON(g:NERDTreePath.FromJSON([ ], a:json))
 endfunction
 
 function! NERDTreeAddMenuItem(options)

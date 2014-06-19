@@ -851,7 +851,11 @@ function! nerdtree#renderView()
     endif
 
     "draw the header line
-    let header = b:NERDTreeRoot.path.str({'format': 'UI', 'truncateTo': winwidth(0)})
+    if ! b:NERDTreeRoot.path.isJSON
+        let header = b:NERDTreeRoot.path.str({'format': 'UI', 'truncateTo': winwidth(0)})
+    else
+        let header = '/' . b:NERDTreeRoot.displayString()
+    endif
     call setline(line(".")+1, header)
     call cursor(line(".")+1, col("."))
 

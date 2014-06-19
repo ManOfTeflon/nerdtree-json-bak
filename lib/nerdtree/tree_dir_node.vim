@@ -233,7 +233,10 @@ function! s:TreeDirNode._initChildren(silent)
         if type(self.path.json) == type("")
             if has_key(g:NERDTreePlugin, "FetchChildren")
                 try
-                    let lines = g:NERDTreePlugin.FetchChildren(self.path.json)
+                    let [ name, lines ] = g:NERDTreePlugin.FetchChildren(self.path.json)
+                    if empty(self.path.pathSegments)
+                        let self.path.pathSegments = [ name ]
+                    endif
                 catch
                     let lines = { "Error running plugin": {} }
                 endtry
@@ -244,11 +247,13 @@ function! s:TreeDirNode._initChildren(silent)
             let lines = self.path.json
         endif
 
-        for [ name, json ] in items(lines)
-            let path = g:NERDTreePath.FromJSON(self.path.pathSegments + [ name ], json)
-            call self.createChild(path, 0)
-            unlet json
-        endfor
+        if type(lines) == type({})
+            for [ name, json ] in items(lines)
+                let path = g:NERDTreePath.FromJSON(self.path.pathSegments + [ name ], json)
+                call self.createChild(path, 0)
+                unlet json
+            endfor
+        endif
 
         call self.sortChildren()
     else
