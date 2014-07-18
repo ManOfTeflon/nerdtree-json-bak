@@ -168,8 +168,8 @@ endif
 
 " SECTION: Public API {{{1
 "============================================================
-function! NERDTreeFromJSON(json)
-    call g:NERDTreeCreator.CreatePrimaryJSON(g:NERDTreePath.FromJSON([ ], a:json))
+function! NERDTreeFromJSON(json, plugin)
+    call g:NERDTreeCreator.CreatePrimaryJSON(g:NERDTreePath.FromJSON([ ], a:json), a:plugin)
 endfunction
 
 function! NERDTreeAddMenuItem(options)
@@ -208,10 +208,6 @@ endfunction
 
 " SECTION: Post Source Actions {{{1
 call nerdtree#postSourceActions()
-
-if ! exists("g:NERDTreePlugin")
-    let g:NERDTreePlugin = { }
-endif
 
 "reset &cpo back to users setting
 let &cpo = s:old_cpo

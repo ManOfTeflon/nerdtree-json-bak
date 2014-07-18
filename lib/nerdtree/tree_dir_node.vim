@@ -231,9 +231,9 @@ function! s:TreeDirNode._initChildren(silent)
         endif
 
         if type(self.path.json) == type("")
-            if has_key(g:NERDTreePlugin, "FetchChildren")
+            if has_key(b:NERDTreePlugin, "FetchChildren")
                 try
-                    let [ name, lines ] = g:NERDTreePlugin.FetchChildren(self.path.json)
+                    let [ name, lines ] = b:NERDTreePlugin.FetchChildren(self.path.json)
                     if empty(self.path.pathSegments)
                         let self.path.pathSegments = [ name ]
                     endif

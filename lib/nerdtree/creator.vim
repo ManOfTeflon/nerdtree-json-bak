@@ -35,18 +35,18 @@ endfunction
 "FUNCTION: s:Creator.CreatePrimary(a:name) {{{1
 function! s:Creator.CreatePrimary(name)
     let creator = s:Creator.New()
-    call creator.createPrimary(a:name, 0)
+    call creator.createPrimary(a:name, 0, {})
 endfunction
 
 "FUNCTION: s:Creator.CreatePrimary(a:name) {{{1
-function! s:Creator.CreatePrimaryJSON(path)
+function! s:Creator.CreatePrimaryJSON(path, plugin)
     let creator = s:Creator.New()
-    call creator.createPrimary(a:path, 1)
+    call creator.createPrimary(a:path, 1, a:plugin)
 endfunction
 
 "FUNCTION: s:Creator.createPrimary(a:name) {{{1
 "name: the name of a bookmark or a directory
-function! s:Creator.createPrimary(name, json)
+function! s:Creator.createPrimary(name, json, plugin)
     if a:json == 0
         let path = self._pathForString(a:name)
     else
@@ -66,10 +66,12 @@ function! s:Creator.createPrimary(name, json)
         unlet t:NERDTreeBufName
     endif
 
+    call self._createTreeWin()
+    let b:NERDTreePlugin = a:plugin
+
     let newRoot = g:NERDTreeDirNode.New(path)
     call newRoot.open()
 
-    call self._createTreeWin()
     let b:treeShowHelp = 0
     let b:NERDTreeIgnoreEnabled = 1
     let b:NERDTreeShowFiles = g:NERDTreeShowFiles
@@ -335,7 +337,7 @@ function! s:Creator.togglePrimary(dir)
             call nerdtree#closeTree()
         endif
     else
-        call self.createPrimary(a:dir, 0)
+        call self.createPrimary(a:dir, 0, {})
     endif
 endfunction
 
