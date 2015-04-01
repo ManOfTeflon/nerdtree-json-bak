@@ -197,15 +197,16 @@ endfunction
 "options etc
 function! s:Creator._createTreeWin()
     "create the nerd tree window
-    let splitLocation = g:NERDTreeWinPos ==# "left" ? "topleft " : "botright "
+    let splitLocation = (g:NERDTreeWinPos ==# "left" || g:NERDTreeWinPos ==# "top") ? "topleft " : "botright "
+    let splitDirection = (g:NERDTreeWinPos ==# "left" || g:NERDTreeWinPos ==# "right") ? "vertical " : ""
     let splitSize = g:NERDTreeWinSize
 
     if !exists('t:NERDTreeBufName')
         let t:NERDTreeBufName = self._nextBufferName()
-        silent! exec splitLocation . 'vertical ' . splitSize . ' new'
+        silent! exec splitLocation . splitDirection . splitSize . ' new'
         silent! exec "edit " . t:NERDTreeBufName
     else
-        silent! exec splitLocation . 'vertical ' . splitSize . ' split'
+        silent! exec splitLocation . splitDirection . splitSize . ' split'
         silent! exec "buffer " . t:NERDTreeBufName
     endif
 
