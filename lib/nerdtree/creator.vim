@@ -32,13 +32,13 @@ function! s:Creator.BufNamePrefix()
     return 'NERD_tree_'
 endfunction
 
-"FUNCTION: s:Creator.CreatePrimary(a:name) {{{1
-function! s:Creator.CreatePrimary(name)
+"FUNCTION: s:Creator.CreatePrimary(a:name, a:plugin) {{{1
+function! s:Creator.CreatePrimary(name, plugin)
     let creator = s:Creator.New()
-    call creator.createPrimary(a:name, 0, {})
+    call creator.createPrimary(a:name, 0, a:plugin)
 endfunction
 
-"FUNCTION: s:Creator.CreatePrimary(a:name) {{{1
+"FUNCTION: s:Creator.CreatePrimaryJSON(a:name, a:plugin) {{{1
 function! s:Creator.CreatePrimaryJSON(path, plugin)
     let creator = s:Creator.New()
     call creator.createPrimary(a:path, 1, a:plugin)

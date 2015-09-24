@@ -188,9 +188,9 @@ function! nerdtree#findAndRevealPath()
         endtry
 
         if p.isUnder(cwd)
-            call g:NERDTreeCreator.CreatePrimary(cwd.str())
+            call g:NERDTreeCreator.CreatePrimary(cwd.str(), {})
         else
-            call g:NERDTreeCreator.CreatePrimary(p.getParent().str())
+            call g:NERDTreeCreator.CreatePrimary(p.getParent().str(), {})
         endif
     else
         if !p.isUnder(g:NERDTreeFileNode.GetRootForTab().path)

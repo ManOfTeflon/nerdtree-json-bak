@@ -385,7 +385,7 @@ endfunction
 "FUNCTION: TreeDirNode._openInNewTab() {{{1
 function! s:TreeDirNode._openInNewTab()
     tabnew
-    call g:NERDTreeCreator.CreatePrimary(self.path.str())
+    call g:NERDTreeCreator.CreatePrimary(self.path.str(), {})
 endfunction
 
 "FUNCTION: TreeDirNode.openRecursively() {{{1

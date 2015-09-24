@@ -161,7 +161,7 @@ function! s:Opener.open(target)
             call self._openDirectory(a:target)
         endif
     else
-        if self._path.isJSON == 0
+        if ! exists('b:NERDTreePlugin')
             call self._openFile()
         else
             if has_key(b:NERDTreePlugin, 'Activate')
@@ -209,7 +209,7 @@ function! s:Opener._openDirectory(node)
             call nerdtree#renderView()
             call a:node.putCursorHere(0, 0)
         elseif self._where == 't'
-            call g:NERDTreeCreator.CreatePrimary(a:node.path.str())
+            call g:NERDTreeCreator.CreatePrimary(a:node.path.str(), {})
         else
             call g:NERDTreeCreator.CreateSecondary(a:node.path.str())
         endif
