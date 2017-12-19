@@ -193,14 +193,21 @@ function! nerdtree#findAndRevealPath()
             call g:NERDTreeCreator.CreatePrimary(p.getParent().str(), {})
         endif
     else
-        if !p.isUnder(g:NERDTreeFileNode.GetRootForTab().path)
+        let root = g:NERDTreeFileNode.GetRootForTab()
+        if root.path.isJSON || !p.isUnder(root.path)
             if !nerdtree#isTreeOpen()
                 call g:NERDTreeCreator.TogglePrimary('')
             else
                 call nerdtree#putCursorInTreeWin()
             endif
             let b:NERDTreeShowHidden = g:NERDTreeShowHidden
-            call nerdtree#chRoot(g:NERDTreeDirNode.New(p.getParent()))
+            let b:NERDTreePlugin = {}
+            if root.path.isJSON
+                let cwd = g:NERDTreePath.New(getcwd())
+            else
+                let cwd = p.getParent()
+            endif
+            call nerdtree#chRoot(g:NERDTreeDirNode.New(cwd))
         else
             if !nerdtree#isTreeOpen()
                 call g:NERDTreeCreator.TogglePrimary("")
@@ -867,6 +874,8 @@ function! nerdtree#renderView()
 
     if b:NERDTreeRoot.path.isJSON
         silent set ft=cpp
+    else
+        silent set ft=nerdtree
     endif
 
     "delete the blank line at the top of the buffer

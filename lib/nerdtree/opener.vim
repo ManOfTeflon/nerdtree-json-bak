@@ -161,18 +161,16 @@ function! s:Opener.open(target)
             call self._openDirectory(a:target)
         endif
     else
-        if ! exists('b:NERDTreePlugin')
+        if ! exists('b:NERDTreePlugin') || ! has_key(b:NERDTreePlugin, 'Activate')
             call self._openFile()
         else
-            if has_key(b:NERDTreePlugin, 'Activate')
-                let Plugin = b:NERDTreePlugin
-                call self._gotoTargetWin()
-                try
-                    call Plugin.Activate(a:target.path)
-                catch
-                    echoe "Error running plugin!"
-                endtry
-            endif
+            let Plugin = b:NERDTreePlugin
+            call self._gotoTargetWin()
+            try
+                call Plugin.Activate(a:target.path)
+            catch
+                echoe "Error running plugin!"
+            endtry
         endif
     endif
 endfunction
